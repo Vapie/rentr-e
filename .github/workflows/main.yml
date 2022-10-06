@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache-dependency-path: 'app-test/package-lock.json'  
         working-directory: app-test
       - run: npm install
       - run: npm ci
