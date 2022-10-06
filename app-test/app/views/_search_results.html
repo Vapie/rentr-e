@@ -23,6 +23,11 @@
       <div class="alert alert-info"><strong>No results</strong></div>
     <% } %>
 
+    <form role="form" method="post" action="/zip?tags=<%= tagsParameter %>">
+      <input type="hidden" class="form-control" name="zip" value="<%= tagsParameter %>">
+      <button type="submit" class="btn btn-primary">Generate zip</button>
+    </form>
+
   </div>
 
 </div>
