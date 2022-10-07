@@ -1,4 +1,3 @@
-require('dotenv').config();
 const {PubSub} = require("@google-cloud/pubsub");
 const {Storage} = require('@google-cloud/storage');
 const photoModel = require('./photo_model');
@@ -7,7 +6,8 @@ const ZipStream = require('zip-stream');
 const express = require('express');
 
 
-collector = (app, myfiles) => {
+
+collector = (app,db) => {
   let timeout = Number(60);
   let messageCount = 0;
   let pics = [];
@@ -23,7 +23,7 @@ collector = (app, myfiles) => {
     //console.log(`\tData: ${message.data}`);
     //console.log(`\tAttributes: ${message.attributes}`);
     messageCount += 1;
-    tags = message.data;
+    tags = message.data.toString();
 
     await photoModel
       .getFlickrPhotos(message.data, 'all')
@@ -39,7 +39,8 @@ collector = (app, myfiles) => {
 
     const result = await store(pics);
     console.log("store result",result)
-    myfiles.push({tags, file: result})
+    
+    await db.ref('toto/titi').push({tags, file: result})
   };
 
   subscription.on('message', messageHandler)
@@ -47,9 +48,8 @@ collector = (app, myfiles) => {
   async function store(pics) {
 
     let queue = pics;
-    let filename = 'public/users/vap-test.zip';
+    let filename = 'public/users/vap-test-'+Date.now()+'.zip';
     const file = await storage.bucket('dmii2022bucket').file(filename);
-    console.log(await storage.bucket('dmii2022bucket').getFiles())
     const stream = file.createWriteStream({ metadata: {
         contentType: 'application/zip',
         cacheControl: 'private'
