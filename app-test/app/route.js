@@ -6,7 +6,7 @@ const { Storage } = require('@google-cloud/storage');
 const moment = require("moment");
 const {doc} = require("prettier");
 
-function route(app) {
+function route(app, myFiles) {
   let storage = new Storage();
 
   app.get('/', async(req, res) => {
@@ -15,11 +15,13 @@ function route(app) {
 
     const ejsLocalVariables = {
       tagsParameter: tags || '',
+
       tagmodeParameter: tagmode || '',
       photos: [],
       searchResults: false,
       invalidParameters: false,
-      link: ''
+      link: '',
+      myFiles
     };
 
     let jobs = app.get('jobs')
@@ -61,6 +63,22 @@ function route(app) {
       .catch(error => {
         return res.status(500).send({error});
       });
+  });
+
+  app.get('/dl', async(req, res) => {
+    const path = req.query.path;
+    console.log("download",path);
+
+    const options = {
+      action: 'read',
+      expires: moment().add(2, 'days').unix() * 1000
+      };
+      const signedUrls = await storage
+      .bucket("dmii2022bucket")
+      .file(path)
+      .getSignedUrl(options)
+      console.log("url" , signedUrls)
+      return res.redirect(signedUrls[0])
   });
 
   app.post('/zip', async (req, res) => {

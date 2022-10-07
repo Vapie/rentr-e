@@ -6,6 +6,7 @@ const app = express();
 
 // public assets
 app.use(express.static(path.join(__dirname, 'public')));
+const myfiles = [];
 app.use(favicon(path.join(__dirname, 'public/images', 'favicon.ico')));
 app.use('/coverage', express.static(path.join(__dirname, '..', 'coverage')));
 
@@ -15,8 +16,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 
 // load route
-require('./route')(app);
-require('./collector')(app);
+require('./route')(app, myfiles);
+require('./collector')(app, myfiles);
 
 // server
 const port = process.env.PORT || 3000;

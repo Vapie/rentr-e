@@ -26,9 +26,19 @@
   </form>
 
 
+    <% if (myFiles.length) { %>
 
-  <% if (link) { %>
-  <a href="<%= link %>">Download zip</a>
-  <% } %>
+      <ul>
+        <% myFiles.forEach(function (yo) { %>
+          <li class="list-unstyled">
+            <a href="/dl?path=<%= yo.file %>" class="thumbnail">
+              <%= yo.tags %>
+            </a>
+          </li>
+        <% }) %>
+      </ul>
 
+    <% } else { %>
+      <div class="alert alert-info"><strong>No results</strong></div>
+    <% } %>
 </div>

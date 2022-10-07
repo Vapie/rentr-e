@@ -7,7 +7,7 @@ const ZipStream = require('zip-stream');
 const express = require('express');
 
 
-collector = (app) => {
+collector = (app, myfiles) => {
   let timeout = Number(60);
   let messageCount = 0;
   let pics = [];
@@ -37,7 +37,9 @@ collector = (app) => {
     // "Ack" (acknowledge receipt of) the message
     message.ack();
 
-    store(pics);
+    const result = await store(pics);
+    console.log("store result",result)
+    myfiles.push({tags, file: result})
   };
 
   subscription.on('message', messageHandler)
@@ -47,6 +49,7 @@ collector = (app) => {
     let queue = pics;
     let filename = 'public/users/vap-test.zip';
     const file = await storage.bucket('dmii2022bucket').file(filename);
+    console.log(await storage.bucket('dmii2022bucket').getFiles())
     const stream = file.createWriteStream({ metadata: {
         contentType: 'application/zip',
         cacheControl: 'private'
@@ -57,7 +60,7 @@ collector = (app) => {
     zip.pipe(stream);
 
     function addNextFile() {
-      console.log('addNextFile', queue.length);
+      console.log('addFlie', );
       const elem = queue.shift()
       const stream = request(elem.media.t)
       zip.entry(stream, {name: 'picture' + queue.length + '.jpg'}, err => {
@@ -65,6 +68,7 @@ collector = (app) => {
           throw err;
         if (queue.length > 0)
           addNextFile();
+
         else {
           zip.finalize();
           //console.log('zip finalised', zip);
@@ -73,13 +77,16 @@ collector = (app) => {
     }
 
     addNextFile();
-
     return new Promise((resolve, reject) => {
       stream.on('error', (err) => {
         reject(err);
       });
       stream.on('finish', () => {
-       //TODO
+        console.log("test")
+        resolve(filename);
+        stream.path
+        stream.end();
+
         
       });
       //stream.end();
