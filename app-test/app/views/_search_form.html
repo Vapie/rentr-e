@@ -25,10 +25,7 @@
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 
-  <form role="form" method="post" action="/zip?tags=<%= tagsParameter %>">
-    <input type="hidden" value="<%= tagsParameter %>"/>
-    <button type="submit" class="btn btn-primary">Generate ZIP</button>
-  </form>
+
 
   <% if (link) { %>
   <a href="<%= link %>">Download zip</a>
